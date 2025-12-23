@@ -37,20 +37,11 @@ class SendStudentActivityReport implements ShouldQueue
         $reportFileName = 'student_activity_report_'.now()->format('Ymd_His').'.pdf';
         Storage::disk('public')->put('/'.$reportFileName, $pdf->output());
         $reportPath = storage_path('app/public/'.$reportFileName);
-        Log::info('email sending'.$reportPath);
         try {
-            Log::info('email sending,......');
             Mail::to($this->authuseremail)->send(new StudentActivityReportMail($reportPath, $reportFileName, $students));
         } catch (\Exception $e) {
             Log::info('email sending failed,......'.$e->getMessage());
-
-            $this->error('Failed to send report: '.$e->getMessage());
         } finally {
-            Log::info('email sending done and remove existing pdf');
-
-            // if (file_exists($reportPath)) {
-            //     unlink($reportPath);
-            // }
         }
     }
 

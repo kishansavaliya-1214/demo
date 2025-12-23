@@ -8,7 +8,6 @@ use Illuminate\Mail\Mailables\Attachment;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\Log;
 
 class StudentActivityReportMail extends Mailable
 {
@@ -28,6 +27,7 @@ class StudentActivityReportMail extends Mailable
         $this->reportPath = $reportPath;
         $this->students = $students;
         $this->reportData = $reportData;
+
     }
 
     /**
@@ -60,22 +60,10 @@ class StudentActivityReportMail extends Mailable
      */
     public function attachments(): array
     {
-        // return [
-        //     Attachment::fromPath($this->reportPath)
-        //         ->as($this->reportData)
-        //         ->withMime('application/pdf'),
-        // ];
-        Log::info('attachment pdf');
-        Log::info(storage_path('app/public/student_activity_report_20251223_064111.pdf'));
-        Log::info(file_exists(storage_path('app/public/student_activity_report_20251223_064111.pdf')));
         return [
-            // Attachment::fromPath("/var/www/html/kishan/importantfiles/demo/storage/app/public/student_activity_report_20251223_064111.pdf")
-            //     ->as("student_activity_report_20251223_064111.pdf")
-            //     ->withMime('application/pdf'),
-
-            Attachment::fromPath(storage_path('app/public/student_activity_report_20251223_064111.pdf'))
-                ->as('student_activity_report_20251223_064111.pdf')
-                ->withMime('application/pdf')
+            Attachment::fromPath($this->reportPath)
+                ->as($this->reportData)
+                ->withMime('application/pdf'),
         ];
     }
 }
