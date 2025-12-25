@@ -79,111 +79,111 @@
         </form>
     </div>
 @endsection
-{{-- @push('scripts')
-    <script>
-        $("#FormEmployeeData").validate({
-            rules: {
-                name: {
-                    required: true,
-                    maxlength:255
-                },
-                phone: {
-                    required: true,
-                    minlength: 10,
-                    maxlength: 10,
-                    digits: true
-                },
-                email: {
-                    required: true,
-                    email: true,
-                    remote: {
-                        url: '{{ route('validate.email') }}',
-                        type: 'post',
-                        data: {
-                            email: function () {
-                                return $("#email").val();
-                            },
-                            _token: function () {
-                                return "{{ csrf_token() }}";
-                            }
+@push('scripts')
+<script>
+    $("#FormEmployeeData").validate({
+        rules: {
+            name: {
+                required: true,
+                maxlength: 255
+            },
+            phone: {
+                required: true,
+                minlength: 10,
+                maxlength: 10,
+                digits: true
+            },
+            email: {
+                required: true,
+                email: true,
+                remote: {
+                    url: '{{ route('validate.email') }}',
+                    type: 'post',
+                    data: {
+                        email: function () {
+                            return $("#email").val();
+                        },
+                        _token: function () {
+                            return "{{ csrf_token() }}";
                         }
                     }
-                },
-                password: {
-                    required: true,
-                    minlength: 8,
-                    strongPassword: true
-                },
-                photo: {
-                    required: true,
-                    extension: "jpg|jpeg",
-                    filesize: 2048
-                },
-                gender: {
-                    required: true,
-                    genderSpecific: true
-                },
-                age: {
-                    required: true,
-                    digits: true,
-                    min: 18,
-                    max: 60
                 }
             },
-            messages: {
-                phone: {
-                    required: "please enter valid phone number",
-                    minlength: "Please enter at least 10 digit.",
-                    maxlength: "Phone number must be exactly 10 digits.",
-                    digits: "Phone number must contain only digits."
-                },
-                photo: {
-                    required: "please choose valid image",
-                    extension: "Only JPG, JPEG, and files are allowed",
-                    filesize: "File size must be less than 2 MB."
-                },
-                name: {
-                    required: "please enter valid name",
-                    maxlength:"Only 255 characters are allowed"
-                },
-                email: {
-                    required: "please enter valid email",
-                    email: "Please enter a valid email address",
-                    remote: "Email is already in use!"
-                },
-                password: {
-                    required: "please enter valid password",
-                    minlength: "Your password must be at least 8 characters long"
-                },
-                gender: {
-                    required: "please select gender"
-                },
-                age: {
-                    required: "please enter valid age",
-                    digits: "age must contain only digits",
-                    min: "min age 18 required",
-                    max: "max age 60 required"
-                },
-                address: {
-                    required: "please select address"
-                }
+            password: {
+                required: true,
+                minlength: 8,
+                strongPassword: true
             },
-            errorPlacement: function (error, element) {
-                if (element.is(":radio")) {
-                    error.appendTo(element.parent().parent());
-                } else {
-                    error.insertAfter(element);
-                }
+            photo: {
+                required: true,
+                extension: "jpg|jpeg",
+                filesize: 2048
+            },
+            gender: {
+                required: true,
+                genderSpecific: true
+            },
+            age: {
+                required: true,
+                digits: true,
+                min: 18,
+                max: 60
             }
-        });
-        $("#photo").on("change", function () {
-            if (this.files && this.files.length > 0) {
-                // remove error class from input
-                $(this).removeClass("error");
+        },
+        messages: {
+            phone: {
+                required: "please enter valid phone number",
+                minlength: "Please enter at least 10 digit.",
+                maxlength: "Phone number must be exactly 10 digits.",
+                digits: "Phone number must contain only digits."
+            },
+            photo: {
+                required: "please choose valid image",
+                extension: "Only JPG, JPEG, and files are allowed",
+                filesize: "File size must be less than 2 MB."
+            },
+            name: {
+                required: "please enter valid name",
+                maxlength: "Only 255 characters are allowed"
+            },
+            email: {
+                required: "please enter valid email",
+                email: "Please enter a valid email address",
+                remote: "Email is already in use!"
+            },
+            password: {
+                required: "please enter valid password",
+                minlength: "Your password must be at least 8 characters long"
+            },
+            gender: {
+                required: "please select gender"
+            },
+            age: {
+                required: "please enter valid age",
+                digits: "age must contain only digits",
+                min: "min age 18 required",
+                max: "max age 60 required"
+            },
+            address: {
+                required: "please select address"
+            }
+        },
+        errorPlacement: function (error, element) {
+            if (element.is(":radio")) {
+                error.appendTo(element.parent().parent());
+            } else {
+                error.insertAfter(element);
+            }
+        }
+    });
+    $("#photo").on("change", function () {
+        if (this.files && this.files.length > 0) {
+            // remove error class from input
+            $(this).removeClass("error");
 
-                // remove the complete error element
-                $("#photo-error").remove();
-            }
-        });
-    </script>
-@endpush --}}
+            // remove the complete error element
+            $("#photo-error").remove();
+        }
+    });
+</script>
+@endpush
