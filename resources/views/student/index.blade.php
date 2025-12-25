@@ -1,6 +1,6 @@
 @extends('layouts.app')
 @section('content')
-    <div class="container mt-2">
+    <div class="container mt-2 table-responsive">
         <a href="{{ route('students.create') }}" class="btn btn-primary my-2">Add Student</a>
         <table class="table table-striped table-bordered data-table" id="studentList">
             <thead>
@@ -17,7 +17,6 @@
                 </tr>
             </thead>
             <tbody>
-
             </tbody>
         </table>
     </div>

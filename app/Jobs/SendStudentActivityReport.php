@@ -18,11 +18,11 @@ class SendStudentActivityReport implements ShouldQueue
     /**
      * Create a new job instance.
      */
-    public $authuseremail;
+    public $authUserEmail;
 
-    public function __construct($authuseremail)
+    public function __construct($authUserEmail)
     {
-        $this->authuseremail = $authuseremail;
+        $this->authUserEmail = $authUserEmail;
     }
 
     /**
@@ -38,7 +38,7 @@ class SendStudentActivityReport implements ShouldQueue
         Storage::disk('public')->put('/'.$reportFileName, $pdf->output());
         $reportPath = storage_path('app/public/'.$reportFileName);
         try {
-            Mail::to($this->authuseremail)->send(new StudentActivityReportMail($reportPath, $reportFileName, $students));
+            Mail::to($this->authUserEmail)->send(new StudentActivityReportMail($reportPath, $reportFileName, $students));
         } catch (\Exception $e) {
             Log::info('email sending failed,......'.$e->getMessage());
         } finally {

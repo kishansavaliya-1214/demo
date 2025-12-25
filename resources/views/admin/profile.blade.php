@@ -2,17 +2,24 @@
 @section('content')
     <div class="container mt-2">
         <h1>Admin Profile</h1>
-        <form action="{{ route('update.admin.profile') }}" id="formemployeedata" method="post" enctype="multipart/form-data">
+        <form action="{{ route('update.admin.profile') }}" id="FormEmployeeData" method="post"
+            enctype="multipart/form-data">
             @csrf
             <div class="form-group my-2">
                 <label for="Name" class="form-label">Name</label>
                 <input type="text" class="form-control" id="name" name="name" value="{{ Auth::user()->name ?? null }}"
                     placeholder="Enter name" required />
+                @error('name')
+                    <span class="error">{{ $message }}</span>
+                @enderror
             </div>
             <div class="form-group my-2">
                 <label for="Email" class="form-label">Email</label>
                 <input type="email" class="form-control" id="email" name="email" placeholder="Enter email"
                     value="{{ Auth::user()->email ?? null }}" required />
+                @error('email')
+                    <span class="error">{{ $message }}</span>
+                @enderror
             </div>
             <div class="form-group my-2">
                 <input type="submit" value="Update Profile " class="btn btn-primary" />
@@ -21,7 +28,7 @@
     </div>
     <div class="container mt-2">
         <h1>Change Password</h1>
-        <form action="{{ route('change.password') }}" id="changepassword" method="post">
+        <form action="{{ route('change.password') }}" id="ChangePassword" method="post">
             @csrf
             <div class="form-group my-2">
                 <div class="form-group my-2">
@@ -36,6 +43,9 @@
                     <input type="password" class="form-control" id="new_password" name="new_password"
                         placeholder="Enter new password" required />
                 </div>
+                @error('new_password')
+                    <span class="error">{{ $message }}</span>
+                @enderror
             </div>
             <div class="form-group my-2">
                 <div class="form-group my-2">
@@ -53,33 +63,37 @@
 @endsection
 @push('scripts')
     <script>
-        $("#formemployeedata").validate({
+        $("#FormEmployeeData").validate({
             rules: {
                 name: {
                     required: true,
                 },
-                email: {
+                 email: {
                     required: true,
-                }
+                    email: true
+                },
             },
             messages: {
                 name: {
                     required: "please enter valid name"
                 },
                 email: {
-                    required: "please enter valid email"
+                    required: "please enter valid email",
+                    email: "Please enter a valid email address"
                 },
             }
         });
     </script>
     <script>
-        $("#changepassword").validate({
+        $("#ChangePassword").validate({
             rules: {
                 old_password: {
                     required: true,
                 },
                 new_password: {
                     required: true,
+                    minlength: 8,
+                    strongPassword: true
                 },
                 confirm_password: {
                     required: true,
@@ -88,13 +102,14 @@
             },
             messages: {
                 old_password: {
-                    required: "please enter valid old_password"
+                    required: "please enter valid old password"
                 },
                 new_password: {
-                    required: "please enter valid new_password"
+                    required: "please enter valid new password",
+                    minlength: "password must be atleast 8 characters"
                 },
                 confirm_password: {
-                    required: "please enter valid confirm_password",
+                    required: "please enter valid confirm password",
                     equalTo: "new password and confirm password both must be match"
                 },
             },

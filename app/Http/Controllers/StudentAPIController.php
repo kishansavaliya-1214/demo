@@ -2,12 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\UserRequest;
 use App\Models\Student;
 use App\Models\User;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Validator;
 
 class StudentAPIController extends Controller
 {
@@ -28,48 +27,35 @@ class StudentAPIController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(UserRequest $request)
     {
-        $validator = Validator::make($request->all(), [
-            'name' => 'required',
-            'email' => 'required|max:255|email|unique:users',
-            'password' => 'required|min:8',
-            'phone' => 'required|max:10',
-            'age' => 'required',
-            'gender' => 'required',
-            'address' => 'required',
-        ]);
-        if ($validator->fails()) {
-            return response()->json([
-                'status' => 'false',
-                'message' => $validator->errors()->first(),
-            ], 422);
-        }
+        $validatedData = $request->validated();
         $user = new User;
-        $user->name = $request->name;
-        $user->email = $request->email;
-        $user->password = Hash::make($request->password);
-        $user->role = 'student';
-        $user->created_by = 2;
+        $user->name = $validatedData['name'];
+        $user->email = $validatedData['email'];
+        if (isset($validatedData['password'])) {
+            $user->password = Hash::make($validatedData['password']);
+        }
+        $user->created_by = auth()->user()->id;
         $user->save();
         $student = new Student;
         $student->user_id = $user->id;
-        if ($request->photo) {
-            $file = $request->file('photo');
+        $student->phone = $validatedData['phone'];
+        $student->gender = $validatedData['gender'];
+        $student->age = $validatedData['age'];
+        $student->address = $validatedData['address'];
+        if ($validatedData['photo']) {
+            $file = $validatedData['photo'];
             $filename = time().'.'.$file->getClientOriginalExtension();
             $file->move(public_path('images'), $filename);
             $student->photo = $filename;
         }
-        $student->phone = $request->phone;
-        $student->age = $request->age;
-        $student->gender = $request->gender;
-        $student->address = $request->address;
         $student->save();
 
         return response()->json([
             'status' => 'true',
             'message' => 'student created successfully',
-        ], 200);
+        ], 201);
     }
 
     /**
@@ -77,7 +63,7 @@ class StudentAPIController extends Controller
      */
     public function show($id)
     {
-        $students = Student::with(['courses', 'user'])->find($id);
+        $students = Student::with(['courses', 'user'])->findOrFail($id);
 
         return response()->json([
             'status' => 'true',
@@ -89,42 +75,26 @@ class StudentAPIController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, $id)
+    public function update(UserRequest $request, $id)
     {
-        $validator = Validator::make($request->all(), [
-            'name' => 'required',
-            'email' => 'required|max:255|email',
-            'phone' => 'required|max:10',
-            'age' => 'required',
-            'gender' => 'required',
-            'address' => 'required',
-        ]);
-        if ($validator->fails()) {
-            return response()->json([
-                'status' => 'false',
-                'message' => $validator->errors()->first(),
-            ], 422);
-        }
-        $student = Student::find($id);
-        $student->user->name = $request->name;
-        $student->user->email = $request->email;
-        if ($request->password) {
-            $student->user->password = Hash::make($request->password);
-        }
+        $validatedData = $request->validated();
+        $student = Student::findOrFail($id);
+        $student->user->name = $validatedData['name'];
+        $student->user->email = $validatedData['email'];
         $student->user->save();
-        if ($request->photo) {
+        $student->phone = $validatedData['phone'];
+        $student->gender = $validatedData['gender'];
+        $student->age = $validatedData['age'];
+        $student->address = $validatedData['address'];
+        if (isset($validatedData['photo']) && ! empty($validatedData['photo'])) {
             if (File::exists(public_path('images/'.$student->photo))) {
                 File::delete(public_path('images/'.$student->photo));
             }
-            $file = $request->file('photo');
+            $file = $validatedData['photo'];
             $filename = time().'.'.$file->getClientOriginalExtension();
             $file->move(public_path('images'), $filename);
             $student->photo = $filename;
         }
-        $student->phone = $request->phone;
-        $student->age = $request->age;
-        $student->gender = $request->gender;
-        $student->address = $request->address;
         $student->save();
 
         return response()->json([
@@ -138,7 +108,10 @@ class StudentAPIController extends Controller
      */
     public function destroy($id)
     {
-        $student = Student::find($id);
+        $student = Student::findOrFail($id);
+        if (File::exists(public_path('images/'.$student->photo))) {
+            File::delete(public_path('images/'.$student->photo));
+        }
         $student->user()->delete();
         if ($student->courses) {
             foreach ($student->courses as $course) {

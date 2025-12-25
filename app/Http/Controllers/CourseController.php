@@ -11,28 +11,25 @@ use Illuminate\Support\Facades\Auth;
 
 class CourseController extends Controller
 {
-    public function displaycourses()
+    public function displayCourses()
     {
         $courses = Course::get();
         $student = Student::where('user_id', Auth::user()->id)->firstOrFail();
-        $studentCourseids = StudentCourses::where('student_id', $student->id)->pluck('course_id')->toArray();
+        $studentCourseIds = StudentCourses::where('student_id', $student->id)->pluck('course_id')->toArray();
 
-        return view('Course.index', compact('courses', 'studentCourseids'));
+        return view('course.index', compact('courses', 'studentCourseIds'));
     }
 
     public function activateStudentCourse(Request $request)
     {
-        $courseid = $request->course_id ?? 0;
+        $courseId = $request->course_id ?? 0;
         $student = Student::where('user_id', Auth::user()->id)->firstOrFail();
-        $studentCourse = new StudentCourses;
-        $studentCourse->student_id = $student->id;
-        $studentCourse->course_id = $courseid;
-        $studentCourse->save();
+        $student->courses()->syncWithoutDetaching([$courseId]);
 
         return response()->json([
             'message' => 'Course Activated Successfully!',
             'status' => 'success',
-            'course_id' => $studentCourse->course_id,
+            'course_id' => $courseId,
         ]);
     }
 

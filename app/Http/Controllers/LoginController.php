@@ -14,15 +14,15 @@ class LoginController extends Controller
         return view('auth.login');
     }
 
-    public function loginform(Request $request)
+    public function loginForm(Request $request)
     {
         $request->validate([
             'email' => 'required|email',
             'password' => 'required',
         ]);
         $user = User::where('email', $request->email)->first();
-        $userpass = $user->password ?? null;
-        if (! $user || ! Hash::check($request->password, $userpass)) {
+        $userPass = $user->password ?? null;
+        if (! $user || ! Hash::check($request->password, $userPass)) {
             return redirect()->route('login')->with('error', 'invalid credentials');
         }
         Auth::login($user);
@@ -35,7 +35,7 @@ class LoginController extends Controller
 
     public function logout(Request $request)
     {
-        Auth::logout(); // Logs out the current user
+        Auth::logout();
 
         $request->session()->invalidate(); // Invalidates the current session
 

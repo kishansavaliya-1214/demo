@@ -19,6 +19,7 @@ return new class extends Migration
             $table->integer('numberofhours');
             $table->decimal('course_fee', 8, 2)->nullable();
             $table->unsignedBigInteger('created_by')->nullable();
+            $table->softDeletes();
             $table->timestamps();
         });
     }

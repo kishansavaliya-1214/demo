@@ -2,7 +2,7 @@
 @section('content')
     <div class="container mt-2">
         <h1>Update Student</h1>
-        <form action="{{ route('students.update', $student->id) }}" id="formemployeedata" method="post"
+        <form action="{{ route('students.update', $student->id) }}" id="FormEmployeeData" method="post"
             enctype="multipart/form-data">
             @csrf
             @method('PUT')
@@ -24,12 +24,19 @@
             </div>
             <div class="form-group my-2">
                 <label for="photo" class="form-label">Photo</label>
-                <input type="file" class="form-control" id="photo" name="photo" />
+                <input type="file" class="form-control" id="photo"
+                    onchange="document.getElementById('imagePreview').src=window.URL.createObjectURL(this.files[0])"
+                    name="photo" />
                 @if ($student->photo)
-                    <img src="{{ asset('images/' . $student->photo) }}" class="rounded mt-2" width="100px" height="100px"
+                    <img src="{{ asset('images/' . $student->photo) }}" id="imagePreview" class="rounded mt-2" width="100"
+                        height="100" alt="">
+                @else
+                    <img src="{{ asset('images/Noimage.png') }}" id="imagePreview" height="100" width="100" class="rounded mt-2"
                         alt="">
                 @endif
-
+                @error('photo')
+                    <span class="text-danger">{{ $message }}</span>
+                @enderror
             </div>
             <div class="form-group my-2">
                 <label for="phone" class="form-label">Phone</label>
@@ -38,7 +45,6 @@
                 @error('phone')
                     <span class="text-danger">{{ $message }}</span>
                 @enderror
-
             </div>
             <div class="form-group my-2">
                 <label for="age" class="form-label">Age</label>
@@ -75,7 +81,7 @@
 
 @push('scripts')
     <script>
-        $("#formemployeedata").validate({
+        $("#FormEmployeeData").validate({
             rules: {
                 name: {
                     required: true,
@@ -88,16 +94,18 @@
                 },
                 email: {
                     required: true,
+                    email: true
                 },
-                password: {
-                    required: true,
+                photo: {
+                    extension: "jpg|jpeg",
+                    filesize: 2048
                 },
-
                 gender: {
                     required: true
                 },
                 age: {
-                    required: true
+                    required: true,
+                    digits: true
                 }
             },
             messages: {
@@ -111,17 +119,20 @@
                     required: "please enter valid name"
                 },
                 email: {
-                    required: "please enter valid email"
+                    required: "please enter valid email",
+                    email: "Please enter a valid email address"
                 },
-                password: {
-                    required: "please enter valid password"
+                photo: {
+                    required: "please choose valid image"
+                                extension: "Only JPG, JPEG files are allowed",
+                    filesize: "File size must be less than 2 MB."
                 },
-
                 gender: {
                     required: "please select gender"
                 },
                 age: {
-                    required: "please enter valid age"
+                    required: "please enter valid age",
+                    digits: "age must contain only digits"
                 },
                 address: {
                     required: "please select address"

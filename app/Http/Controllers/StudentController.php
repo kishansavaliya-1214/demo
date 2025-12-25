@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\UserRequest;
 use App\Models\Student;
 use App\Models\User;
 use DataTables;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Hash;
 
 class StudentController extends Controller
 {
@@ -18,7 +19,6 @@ class StudentController extends Controller
             $authUserId = auth()->id();
             $data = Student::with(['user'])
                 ->whereHas('user', function ($query) use ($authUserId) {
-                    // Add condition to the related 'users' table query
                     $query->where('created_by', $authUserId);
                 });
 
@@ -37,9 +37,9 @@ class StudentController extends Controller
                 })
                 ->addColumn('action', function ($row) {
 
-                    $btn = '<div class="d-flex" style="gap: 5px;"><a href="'.route('students.show', $row->id).'" class="edit btn btn-primary btn-sm">View</a>';
-                    $btn .= '<a href="'.route('students.edit', $row->id).'" class="edit btn btn-warning btn-sm">Edit</a>';
-                    $btn .= '<form action="'.route('students.destroy', $row->id).'" id="deleteform-'.$row->id.'" method="post" class="d-inline">';
+                    $btn = '<div class="d-flex" style="gap: 5px;"><a href="'.route('students.show', encrypt($row->id)).'" class="edit btn btn-primary btn-sm">View</a>';
+                    $btn .= '<a href="'.route('students.edit', encrypt($row->id)).'" class="edit btn btn-warning btn-sm">Edit</a>';
+                    $btn .= '<form action="'.route('students.destroy', encrypt($row->id)).'" id="deleteform-'.$row->id.'" method="post" class="d-inline">';
 
                     $btn .= '<input type="hidden" name="_token" value="'.csrf_token().'">';
                     $btn .= '<input type="hidden" name="_method" value="DELETE">';
@@ -76,35 +76,25 @@ class StudentController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(UserRequest $request)
     {
-        $validator = Validator::make($request->all(), [
-            'name' => 'required',
-            'email' => 'required|unique:users|email',
-            'password' => 'required',
-            'phone' => 'required|numeric|digits:10',
-            'age' => 'required',
-            'gender' => 'required',
-            'address' => 'required',
-        ]);
-        if ($validator->fails()) {
-            return redirect()->back()->withErrors($validator->errors());
-        }
+        $validatedData = $request->validated();
         $user = new User;
-        $user->name = $request->name;
-        $user->email = $request->email;
-        $user->password = bcrypt($request->password);
-        $user->role = 'student';
+        $user->name = $validatedData['name'];
+        $user->email = $validatedData['email'];
+        if (isset($validatedData['password'])) {
+            $user->password = Hash::make($validatedData['password']);
+        }
         $user->created_by = Auth::user()->id;
         $user->save();
         $student = new Student;
         $student->user_id = $user->id;
-        $student->phone = $request->phone;
-        $student->gender = $request->gender;
-        $student->age = $request->age;
-        $student->address = $request->address;
-        if ($request->photo) {
-            $file = $request->file('photo');
+        $student->phone = $validatedData['phone'];
+        $student->gender = $validatedData['gender'];
+        $student->age = $validatedData['age'];
+        $student->address = $validatedData['address'];
+        if ($validatedData['photo']) {
+            $file = $validatedData['photo'];
             $filename = time().'.'.$file->getClientOriginalExtension();
             $file->move(public_path('images'), $filename);
             $student->photo = $filename;
@@ -119,7 +109,12 @@ class StudentController extends Controller
      */
     public function show($id)
     {
-        $student = Student::find($id);
+        try {
+            $id = decrypt($id);
+        } catch (\Throwable $th) {
+            return redirect()->route('students.index')->with('error', 'Student Not Found');
+        }
+        $student = Student::findOrFail($id);
 
         return view('student.show', compact('student'));
     }
@@ -129,7 +124,12 @@ class StudentController extends Controller
      */
     public function edit($id)
     {
-        $student = Student::find($id);
+        try {
+            $id = decrypt($id);
+        } catch (\Throwable $th) {
+            return redirect()->route('students.index')->with('error', 'Student Not Found');
+        }
+        $student = Student::findOrFail($id);
 
         return view('student.edit', compact('student'));
     }
@@ -137,35 +137,27 @@ class StudentController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, $id)
+    public function update(UserRequest $request, $id)
     {
-        $request->validate([
-            'name' => 'required',
-            'email' => 'required|email',
-            'phone' => 'required|numeric|digits:10',
-            'age' => 'required',
-            'gender' => 'required',
-            'address' => 'required',
-        ]);
-        $student = Student::find($id);
-        $student->phone = $request->phone;
-        $student->gender = $request->gender;
-        $student->age = $request->age;
-        $student->address = $request->address;
-        if ($request->photo) {
+        $validatedData = $request->validated();
+        $student = Student::findOrFail($id);
+        $student->user->name = $validatedData['name'];
+        $student->user->email = $validatedData['email'];
+        $student->user->save();
+        $student->phone = $validatedData['phone'];
+        $student->gender = $validatedData['gender'];
+        $student->age = $validatedData['age'];
+        $student->address = $validatedData['address'];
+        if (isset($validatedData['photo']) && ! empty($validatedData['photo'])) {
             if (File::exists(public_path('images/'.$student->photo))) {
                 File::delete(public_path('images/'.$student->photo));
             }
-            $file = $request->file('photo');
+            $file = $validatedData['photo'];
             $filename = time().'.'.$file->getClientOriginalExtension();
             $file->move(public_path('images'), $filename);
             $student->photo = $filename;
         }
         $student->save();
-        $user = User::find($student->user_id);
-        $user->name = $request->name;
-        $user->email = $request->email;
-        $user->save();
 
         return redirect()->route('students.index')->with('success', 'student updated successfully');
     }
@@ -175,12 +167,18 @@ class StudentController extends Controller
      */
     public function destroy(string $id)
     {
-        $student = Student::find($id);
+        try {
+            $id = decrypt($id);
+        } catch (\Throwable $th) {
+            return redirect()->route('students.index')->with('error', 'Student Not Found');
+        }
+        $student = Student::findOrFail($id);
         if (File::exists(public_path('images/'.$student->photo))) {
             File::delete(public_path('images/'.$student->photo));
         }
-        $user = User::find($student->user_id);
-        $user->delete();
+        if ($student->user) {
+            $student->user->delete();
+        }
         $student->delete();
 
         return redirect()->route('students.index')->with('success', 'student deleted successfully');

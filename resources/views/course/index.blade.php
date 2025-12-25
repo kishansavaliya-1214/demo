@@ -10,8 +10,8 @@
                         <p class="card-text">{{$course->description ?? null }}</p>
                         <div>Numbers Of Hours : {{$course->numberofhours ?? null }}</div>
                         <div>Fees: {{$course->course_fee ?? null }}</div>
-                        <button class="btn btn-primary" @if(in_array($course->id, $studentCourseids)) {{ "disabled" }}
-                        @endif>@if(in_array($course->id, $studentCourseids)) {{ "Activated" }} @else {{ "Activate" }}
+                        <button class="btn btn-primary" @if(in_array($course->id, $studentCourseIds)) {{ "disabled" }}
+                        @endif>@if(in_array($course->id, $studentCourseIds)) {{ "Activated" }} @else {{ "Activate" }}
                             @endif</button>
                     </div>
                 </div>

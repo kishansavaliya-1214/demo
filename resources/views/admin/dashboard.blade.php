@@ -6,7 +6,7 @@
             <div class="card shadow-lg border-light">
                 <div class="card-body text-center">
                     <h5 class="card-title">Total Students</h5>
-                    <p class="card-text"><i class="fa fa-group"></i> {{ $totalstudents ?? 0 }}</p>
+                    <p class="card-text"><i class="fa fa-group"></i> {{ $totalStudents ?? 0 }}</p>
                 </div>
             </div>
         </div>
@@ -14,7 +14,7 @@
             <div class="card shadow-lg border-light">
                 <div class="card-body text-center">
                     <h5 class="card-title">Total Male Students</h5>
-                    <p class="card-text"><i class="fa fa-male"></i> {{ $totalmalestudents ?? 0 }}</p>
+                    <p class="card-text"><i class="fa fa-male"></i> {{ $totalMaleStudents ?? 0 }}</p>
                 </div>
             </div>
         </div>
@@ -22,7 +22,7 @@
             <div class="card shadow-lg border-light">
                 <div class="card-body text-center">
                     <h5 class="card-title">Total FeMale Students</h5>
-                    <p class="card-text"><i class="fa fa-female"></i> {{ $totalfemalestudents ?? 0 }}</p>
+                    <p class="card-text"><i class="fa fa-female"></i> {{ $totalFemaleStudents ?? 0 }}</p>
                 </div>
             </div>
         </div>
@@ -30,7 +30,7 @@
             <div class="card shadow-lg border-light">
                 <div class="card-body text-center">
                     <h5 class="card-title">Total Courses</h5>
-                    <p class="card-text"><i class="fa fa-book"></i>{{ $totalcources ?? 0 }}</p>
+                    <p class="card-text"><i class="fa fa-book"></i>{{ $totalCources ?? 0 }}</p>
                 </div>
             </div>
         </div>
@@ -50,7 +50,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @forelse ($lateststudents as $student)
+                    @forelse ($latestStudents as $student)
                         <tr>
                             <td>{{ $student->name }}</td>
                             <td><img src="{{ asset('images/' . $student->student->photo ?? '') }}" width="150px"></td>

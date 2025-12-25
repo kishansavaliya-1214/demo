@@ -13,13 +13,13 @@ return new class extends Migration
     {
         Schema::create('students', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('user_id');
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->string('photo')->nullable();
-            $table->string('phone');
-            $table->integer('age');
-            $table->string('gender');
+            $table->string('phone', 15);
+            $table->unsignedTinyInteger('age');
+            $table->enum('gender', ['male', 'female', 'other']);
             $table->text('address');
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->softDeletes();
             $table->timestamps();
         });
     }

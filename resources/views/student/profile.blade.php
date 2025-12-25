@@ -2,7 +2,7 @@
 @section('content')
     <div class="container mt-2">
         <h1>Student Profile</h1>
-        <form action="{{ route('students.profile.update') }}" id="formemployeedata" method="post"
+        <form action="{{ route('students.profile.update') }}" id="FormEmployeeData" method="post"
             enctype="multipart/form-data">
             @csrf
             <div class="form-group my-2">
@@ -52,7 +52,7 @@
     </div>
     <div class="container mt-2">
         <h1>Change Password</h1>
-        <form action="{{ route('change.password') }}" id="changepassword" method="post">
+        <form action="{{ route('change.password') }}" id="ChangePassword" method="post">
             @csrf
             <div class="form-group my-2">
                 <div class="form-group my-2">
@@ -84,41 +84,49 @@
 @endsection
 @push('scripts')
     <script>
-        $("#formemployeedata").validate({
+        $("#FormEmployeeData").validate({
             rules: {
                 name: {
                     required: true,
                 },
-                phone: {
-                    required: true,
-                    minlength: 10
+                 phone: {
+                    required: "please enter valid phone number",
+                    minlength: "Please enter at least 10 digit.",
+                    maxlength: "Phone number must be exactly 10 digits.",
+                    digits: "Phone number must contain only digits."
                 },
                 email: {
-                    required: true,
+                    required: "please enter valid email",
+                    email: "Please enter a valid email address"
                 },
                 gender: {
                     required: true
                 },
-                age: {
-                    required: true
+                 age: {
+                    required: true,
+                    digits: true
                 }
             },
             messages: {
-                phone: {
+               phone: {
                     required: "please enter valid phone number",
-                    minlength: "Please enter at least 10 digit."
+                    minlength: "Please enter at least 10 digit.",
+                    maxlength: "Phone number must be exactly 10 digits.",
+                    digits: "Phone number must contain only digits."
                 },
                 name: {
                     required: "please enter valid name"
                 },
-                email: {
-                    required: "please enter valid email"
+                 email: {
+                    required: "please enter valid email",
+                    email: "Please enter a valid email address"
                 },
                 gender: {
                     required: "please select gender"
                 },
-                age: {
-                    required: "please enter valid age"
+                 age: {
+                    required: "please enter valid age",
+                    digits: "age must contain only digits"
                 },
                 address: {
                     required: "please select address"
@@ -134,7 +142,7 @@
         });
     </script>
     <script>
-        $("#changepassword").validate({
+        $("#ChangePassword").validate({
             rules: {
                 old_password: {
                     required: true,
@@ -149,13 +157,13 @@
             },
             messages: {
                 old_password: {
-                    required: "please enter valid old_password"
+                    required: "please enter valid old password"
                 },
                 new_password: {
-                    required: "please enter valid new_password"
+                    required: "please enter valid new password"
                 },
                 confirm_password: {
-                    required: "please enter valid confirm_password",
+                    required: "please enter valid confirm password",
                     equalTo: "new password and confirm password both must be match"
                 },
             },

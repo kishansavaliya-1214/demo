@@ -30,11 +30,11 @@ class CreateCoursesJob implements ShouldQueue
         $faker = Faker::create();
         $response = Http::get('https://dummyjson.com/products?limit=100');
         $data = $response->json();
-        $productimages = [];
+        $productImages = [];
 
         if (isset($data['products']) && is_array($data['products'])) {
             foreach ($data['products'] as $product) {
-                $productimages[] = $product['thumbnail'];
+                $productImages[] = $product['thumbnail'];
             }
         }
 
@@ -43,7 +43,7 @@ class CreateCoursesJob implements ShouldQueue
             Course::create([
                 'name' => $faker->name,
                 'description' => $faker->sentence,
-                'image' => $productimages[array_rand($productimages)],
+                'image' => $productImages[array_rand($productImages)],
                 'course_fee' => $faker->randomNumber(4),
                 'created_by' => $faker->numberBetween(1, 10),
                 'numberofhours' => $faker->numberBetween(10, 200),

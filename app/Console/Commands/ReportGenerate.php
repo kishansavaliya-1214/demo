@@ -26,9 +26,9 @@ class ReportGenerate extends Command
      */
     public function handle()
     {
-        $authuseremail = $this->argument('email');
+        $authUserEmail = $this->argument('email');
 
-        SendStudentActivityReport::dispatch($authuseremail);
+        SendStudentActivityReport::dispatch($authUserEmail);
 
         $this->info('Student course activity report generation job dispatched to queue successfully.');
     }

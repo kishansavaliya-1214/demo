@@ -3,14 +3,18 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Auth;
+use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+    use HasApiTokens, HasFactory,Notifiable,SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -21,6 +25,8 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role',
+        'created_by',
     ];
 
     /**
@@ -49,5 +55,15 @@ class User extends Authenticatable
     public function student()
     {
         return $this->hasOne(Student::class, 'user_id', 'id');
+    }
+
+    public function scopeAdmin(Builder $query): void
+    {
+        $query->where('role', 'admin')->where('created_by', Auth::user()->id);
+    }
+
+    public function scopeStudents(Builder $query): void
+    {
+        $query->where('role', 'student')->where('created_by', Auth::user()->id);
     }
 }

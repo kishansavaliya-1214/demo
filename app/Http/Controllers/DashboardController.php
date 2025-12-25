@@ -8,29 +8,29 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rules\Password;
 
 class DashboardController extends Controller
 {
     public function index()
     {
-        $totalstudents = User::where('created_by', Auth::user()->id)->where('role', 'student')->count();
-        $baseStudentQuery = User::where('created_by', Auth::user()->id)
-            ->where('role', 'student');
-        $totalmalestudents = (clone $baseStudentQuery)
+        $totalStudents = User::students()->count();
+        $baseStudentQuery = User::students();
+        $totalMaleStudents = (clone $baseStudentQuery)
             ->whereHas('student', function ($query) {
                 $query->where('gender', 'male');
             })->count();
-        $totalfemalestudents = (clone $baseStudentQuery)
+        $totalFemaleStudents = (clone $baseStudentQuery)
             ->whereHas('student', function ($query) {
                 $query->where('gender', 'female');
             })->count();
-        $totalcources = Course::count();
-        $lateststudents = (clone $baseStudentQuery)->with(['student'])->latest()->take(5)->get();
+        $totalCources = Course::count();
+        $latestStudents = (clone $baseStudentQuery)->with(['student'])->latest()->take(5)->get();
 
-        return view('admin.dashboard', compact('totalstudents', 'lateststudents', 'totalmalestudents', 'totalfemalestudents', 'totalcources'));
+        return view('admin.dashboard', compact('totalStudents', 'latestStudents', 'totalMaleStudents', 'totalFemaleStudents', 'totalCources'));
     }
 
-    public function studentdashboard()
+    public function studentDashboard()
     {
         return view('student.dashboard');
     }
@@ -48,10 +48,10 @@ class DashboardController extends Controller
     public function updateAdminProfile(Request $request)
     {
         $request->validate([
-            'name' => 'required',
-            'email' => 'required|email',
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255|unique:users,email,'.Auth::user()->id,
         ]);
-        $user = User::find(Auth::user()->id);
+        $user = auth()->user();
         $user->name = $request->name;
         $user->email = $request->email;
         $user->save();
@@ -62,14 +62,14 @@ class DashboardController extends Controller
     public function updateStudentProfile(Request $request)
     {
         $request->validate([
-            'name' => 'required',
+            'name' => 'required|string|max:255',
             'email' => 'required|email',
             'phone' => 'required|min:10',
             'age' => 'required',
             'gender' => 'required',
             'address' => 'required',
         ]);
-        $user = User::find(Auth::user()->id);
+        $user = User::findOrFail(Auth::user()->id);
         $user->name = $request->name;
         $user->email = $request->email;
         $user->save();
@@ -93,7 +93,7 @@ class DashboardController extends Controller
     {
         $request->validate([
             'old_password' => 'required',
-            'new_password' => 'required|min:8',
+            'new_password' => ['required', Password::min(8)->letters()->mixedCase()->numbers()->symbols()],
         ]);
 
         if (! Hash::check($request->old_password, auth()->user()->password)) {

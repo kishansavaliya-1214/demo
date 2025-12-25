@@ -8,8 +8,8 @@
                     <th scope="col">Name</th>
                     <th scope="col">Image</th>
                     <th scope="col">Description</th>
-                    <th scope="col">numberofhours</th>
-                    <th scope="col">course_fee</th>
+                    <th scope="col">Number Of Hours</th>
+                    <th scope="col">Course Fee</th>
                 </tr>
             </thead>
             <tbody></tbody>
