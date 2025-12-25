@@ -123,8 +123,8 @@
                     email: "Please enter a valid email address"
                 },
                 photo: {
-                    required: "please choose valid image"
-                                extension: "Only JPG, JPEG files are allowed",
+                    required: "please choose valid image",
+                    extension: "Only JPG, JPEG files are allowed",
                     filesize: "File size must be less than 2 MB."
                 },
                 gender: {
