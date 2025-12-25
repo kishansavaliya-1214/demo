@@ -12,66 +12,9 @@
         integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
         crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/jquery.validate.min.js"></script>
+    <link rel="stylesheet" href="{{ asset('css/styles.css') }}">
     <title>Tasks</title>
 </head>
-
-<style>
-    body {
-        background-color: #f4f6f9;
-        font-family: Arial, sans-serif;
-    }
-
-    .error {
-        color: red;
-    }
-
-    .container {
-        max-width: 400px;
-        background-color: #fff;
-        padding: 30px;
-        border-radius: 10px;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-        margin-top: 50px;
-    }
-
-    h1 {
-        font-size: 2rem;
-        text-align: center;
-        margin-bottom: 30px;
-    }
-
-    .alert {
-        margin-bottom: 20px;
-        font-size: 1rem;
-    }
-
-    .btn-primary {
-        background-color: #007bff;
-        border-color: #007bff;
-        padding: 10px;
-        width: 100%;
-        border-radius: 5px;
-    }
-
-    .btn-primary:hover {
-        background-color: #0056b3;
-        border-color: #0056b3;
-    }
-
-    .form-control {
-        border-radius: 5px;
-        font-size: 1rem;
-    }
-
-    .form-label {
-        font-size: 1rem;
-    }
-
-    .text-danger {
-        font-size: 0.875rem;
-        color: red;
-    }
-</style>
 
 <body>
     <div class="container mt-5">
@@ -85,7 +28,7 @@
             @csrf
             <div class="mb-3 mt-3">
                 <label for="email" class="form-label">Email:</label>
-                <input type="email" class="form-control" id="email" placeholder="Enter email" name="email">
+                <input type="email" class="form-control" id="email" value="{{ old('email') }}" placeholder="Enter email" name="email">
                 @error('email')
                     <div class="text-danger">
                         {{ $message }}

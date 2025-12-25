@@ -8,6 +8,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Response;
 use Illuminate\Validation\Rules\Password;
 
 class DashboardController extends Controller
@@ -87,6 +88,29 @@ class DashboardController extends Controller
         $student->save();
 
         return redirect()->back()->with('success', 'profile updated successfully');
+    }
+
+    public function validateEmail(Request $request)
+    {
+        $email = $request->input('email');
+        $studentId = $request->input('student_id');
+
+        if ($studentId) {
+            // For student editing - exclude the student's user ID
+            $student = Student::find($studentId);
+            $excludeUserId = $student ? $student->user_id : null;
+        } else {
+            // For admin profile editing - exclude admin's ID
+            $excludeUserId = Auth::user()->id;
+        }
+        $userExists = User::where('email', $email)->where('id', '!=', $excludeUserId)
+                         ->first();
+
+        if ($userExists) {
+            return Response::json('This email address is already registered.');
+        } else {
+            return Response::json(true);
+        }
     }
 
     public function changePassword(Request $request)

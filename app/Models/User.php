@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -57,12 +58,14 @@ class User extends Authenticatable
         return $this->hasOne(Student::class, 'user_id', 'id');
     }
 
-    public function scopeAdmin(Builder $query): void
+    #[Scope]
+    protected function admin(Builder $query): void
     {
         $query->where('role', 'admin')->where('created_by', Auth::user()->id);
     }
 
-    public function scopeStudents(Builder $query): void
+    #[Scope]
+    protected function students(Builder $query): void
     {
         $query->where('role', 'student')->where('created_by', Auth::user()->id);
     }

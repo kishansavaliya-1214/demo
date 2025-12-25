@@ -2,14 +2,15 @@
 @section('content')
     <div class="container mt-2">
         <h1>Update Student</h1>
+
         <form action="{{ route('students.update', $student->id) }}" id="FormEmployeeData" method="post"
             enctype="multipart/form-data">
             @csrf
             @method('PUT')
             <div class="form-group my-2">
                 <label for="Name" class="form-label">Name</label>
-                <input type="text" class="form-control" id="name" name="name" value="{{ $student->user->name ?? null }}"
-                    placeholder="Enter name" required />
+                <input type="text" class="form-control" id="name" name="name"
+                    value="{{ old('name', $student->user->name ?? null) }}" placeholder="Enter name" required />
                 @error('name')
                     <span class="text-danger">{{ $message }}</span>
                 @enderror
@@ -17,7 +18,7 @@
             <div class="form-group my-2">
                 <label for="Email" class="form-label">Email</label>
                 <input type="email" class="form-control" id="email" name="email" placeholder="Enter email"
-                    value="{{ $student->user->email ?? null }}" required />
+                    value="{{ old('email', $student->user->email ?? null) }}" required />
                 @error('email')
                     <span class="text-danger">{{ $message }}</span>
                 @enderror
@@ -40,15 +41,15 @@
             </div>
             <div class="form-group my-2">
                 <label for="phone" class="form-label">Phone</label>
-                <input type="number" class="form-control" id="phone" minlength="10" value="{{ $student->phone }}"
-                    name="phone" placeholder="Enter phone" required />
+                <input type="number" class="form-control" id="phone" minlength="10"
+                    value="{{ old('phone', $student->phone ?? null) }}" name="phone" placeholder="Enter phone" required />
                 @error('phone')
                     <span class="text-danger">{{ $message }}</span>
                 @enderror
             </div>
             <div class="form-group my-2">
                 <label for="age" class="form-label">Age</label>
-                <input type="number" class="form-control" id="age" name="age" value="{{ $student->age }}"
+                <input type="number" class="form-control" id="age" name="age" value="{{ old('age', $student->age ?? null) }}"
                     placeholder="Enter age" required />
                 @error('age')
                     <span class="text-danger">{{ $message }}</span>
@@ -67,7 +68,7 @@
             <div class="form-group my-2">
                 <label for="address" class="form-label">Address</label>
                 <textarea name="address" id="address" class="form-control" placeholder="Enter Address"
-                    required>{{ $student->address }}</textarea>
+                    required>{{ old('address', $student->address ?? null) }}</textarea>
                 @error('address')
                     <span class="text-danger">{{ $message }}</span>
                 @enderror
@@ -78,13 +79,21 @@
         </form>
     </div>
 @endsection
-
 @push('scripts')
     <script>
+        // Add custom filesize validation method
+        $("#FormEmployeeData").on('submit', function (e) {
+            e.preventDefault();
+        });
+
         $("#FormEmployeeData").validate({
+            submitHandler: function (form) {
+                form.submit();
+            },
             rules: {
                 name: {
                     required: true,
+                    maxlength:255
                 },
                 phone: {
                     required: true,
@@ -94,18 +103,34 @@
                 },
                 email: {
                     required: true,
-                    email: true
+                    email: true,
+                    remote: {
+                        url: '{{ route('validate.email') }}',
+                        type: 'post',
+                        data: {
+                            email: function () {
+                                return $("#email").val();
+                            },
+                            student_id: {{ $student->id ?? 0 }},
+                            _token: function () {
+                                return "{{ csrf_token() }}";
+                            }
+                        }
+                    }
                 },
                 photo: {
                     extension: "jpg|jpeg",
                     filesize: 2048
                 },
                 gender: {
-                    required: true
+                    required: true,
+                    genderSpecific: true
                 },
                 age: {
                     required: true,
-                    digits: true
+                    digits: true,
+                    min: 18,
+                    max: 60
                 }
             },
             messages: {
@@ -116,11 +141,13 @@
                     digits: "Phone number must contain only digits."
                 },
                 name: {
-                    required: "please enter valid name"
+                    required: "please enter valid name",
+                    maxlength:"Only 255 characters are allowed"
                 },
                 email: {
                     required: "please enter valid email",
-                    email: "Please enter a valid email address"
+                    email: "Please enter a valid email address",
+                    remote: "This email address is already registered."
                 },
                 photo: {
                     required: "please choose valid image",
@@ -132,7 +159,9 @@
                 },
                 age: {
                     required: "please enter valid age",
-                    digits: "age must contain only digits"
+                    digits: "age must contain only digits",
+                    min: "min age 18 required",
+                    max: "max age 60 required"
                 },
                 address: {
                     required: "please select address"

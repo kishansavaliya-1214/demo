@@ -16,6 +16,7 @@
     <script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/additional-methods.min.js"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="{{ asset('css/styles.css') }}">
 
     <link href="https://cdn.datatables.net/2.3.5/css/dataTables.bootstrap5.css">
     </link>
@@ -49,7 +50,7 @@
     <div class="container">
         <div class="row">
             {{-- Main Content --}}
-            <main class="col-md-9">
+            <main class="col-md-12">
                 @yield('content')
             </main>
         </div>

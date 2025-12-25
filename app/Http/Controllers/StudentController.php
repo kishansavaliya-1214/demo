@@ -33,7 +33,7 @@ class StudentController extends Controller
                 ->addColumn('photo', function ($row) {
                     $url = asset("images/$row->photo");
 
-                    return '<img src="'.$url.'" border="0" width="100" class="img-rounded" align="center" />';
+                    return '<img src="'.$url.'" border="0" width="100" height="100" class="img-rounded" align="center" />';
                 })
                 ->addColumn('action', function ($row) {
 

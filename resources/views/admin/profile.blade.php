@@ -7,7 +7,7 @@
             @csrf
             <div class="form-group my-2">
                 <label for="Name" class="form-label">Name</label>
-                <input type="text" class="form-control" id="name" name="name" value="{{ Auth::user()->name ?? null }}"
+                <input type="text" class="form-control" id="name" name="name" value="{{ old('name', Auth::user()->name) }}"
                     placeholder="Enter name" required />
                 @error('name')
                     <span class="error">{{ $message }}</span>
@@ -16,7 +16,7 @@
             <div class="form-group my-2">
                 <label for="Email" class="form-label">Email</label>
                 <input type="email" class="form-control" id="email" name="email" placeholder="Enter email"
-                    value="{{ Auth::user()->email ?? null }}" required />
+                    value="{{ old('email', Auth::user()->email) }}" required />
                 @error('email')
                     <span class="error">{{ $message }}</span>
                 @enderror
@@ -67,19 +67,34 @@
             rules: {
                 name: {
                     required: true,
+                    maxlength: 255
                 },
-                 email: {
+                email: {
                     required: true,
-                    email: true
+                    email: true,
+                    remote: {
+                        url: '{{ route('validate.email') }}',
+                        type: 'post',
+                        data: {
+                            email: function () {
+                                return $("#email").val();
+                            },
+                            _token: function () {
+                                return "{{ csrf_token() }}";
+                            }
+                        }
+                    }
                 },
             },
             messages: {
                 name: {
-                    required: "please enter valid name"
+                    required: "please enter valid name",
+                    maxlength: "Only 255 characters are allowed"
                 },
                 email: {
                     required: "please enter valid email",
-                    email: "Please enter a valid email address"
+                    email: "Please enter a valid email address",
+                    remote: "This email address is already registered."
                 },
             }
         });

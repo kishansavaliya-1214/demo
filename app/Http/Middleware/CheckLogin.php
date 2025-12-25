@@ -16,8 +16,26 @@ class CheckLogin
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (! Auth::user()) { // Check if user is NOT logged in
-            return redirect()->route('login');
+        if (Auth::user() && Auth::user()->role == "admin") {
+
+            if ($request->routeIs('login')) {
+                return redirect()->route('admin.dashboard');
+            }
+
+            return $next($request);
+        }
+        if (Auth::user() && Auth::user()->role == "student") {
+            if ($request->routeIs('login')) {
+                return redirect()->route('student.dashboard');
+            }
+
+            return $next($request);
+        }
+
+        if (! Auth::user()) {
+            if ($request->routeIs('login')) {
+                return $next($request);
+            }
         }
 
         return $next($request);

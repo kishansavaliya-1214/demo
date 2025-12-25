@@ -1,4 +1,4 @@
-<nav class="navbar navbar-expand-lg navbar-light bg-light custom-navbar">
+<nav class="navbar navbar-expand-lg navbar-light bg-light p-3 custom-navbar">
     @if (Auth::user()->role == 'admin')
         <a class="navbar-brand" href="{{ route('admin.dashboard') }}">Admin System</a>
     @else

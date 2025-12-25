@@ -57,7 +57,7 @@
             </div>
             <div class="form-group my-2">
                 <label for="gender" class="form-label">gender :</label>
-                <input type="radio" class="form-check-input me-2" name="gender" id="gender" value="male" @if (old('gender') == 'male'){{ "checked" }}@endif><label for="">Male</label>
+                <input type="radio" class="form-check-input me-2" name="gender" id="gender" value="male" @if (old('gender') == 'male'){{ "checked" }}@endif checked><label for="">Male</label>
                 <input type="radio" class="form-check-input me-2" name="gender" id="gender" value="female" @if (old('gender') == 'female'){{ "checked" }}@endif /><label for="">FeMale</label>
                 <br />
                 <label id="gender-error" class="error" style="display:none;" for="gender">please select gender</label>
@@ -79,22 +79,35 @@
         </form>
     </div>
 @endsection
-@push('scripts')
+{{-- @push('scripts')
     <script>
         $("#FormEmployeeData").validate({
             rules: {
                 name: {
                     required: true,
+                    maxlength:255
                 },
-
                 phone: {
+                    required: true,
                     minlength: 10,
                     maxlength: 10,
                     digits: true
                 },
                 email: {
                     required: true,
-                    email: true
+                    email: true,
+                    remote: {
+                        url: '{{ route('validate.email') }}',
+                        type: 'post',
+                        data: {
+                            email: function () {
+                                return $("#email").val();
+                            },
+                            _token: function () {
+                                return "{{ csrf_token() }}";
+                            }
+                        }
+                    }
                 },
                 password: {
                     required: true,
@@ -107,11 +120,14 @@
                     filesize: 2048
                 },
                 gender: {
-                    required: true
+                    required: true,
+                    genderSpecific: true
                 },
                 age: {
                     required: true,
-                    digits: true
+                    digits: true,
+                    min: 18,
+                    max: 60
                 }
             },
             messages: {
@@ -127,23 +143,26 @@
                     filesize: "File size must be less than 2 MB."
                 },
                 name: {
-                    required: "please enter valid name"
+                    required: "please enter valid name",
+                    maxlength:"Only 255 characters are allowed"
                 },
                 email: {
                     required: "please enter valid email",
-                    email: "Please enter a valid email address"
+                    email: "Please enter a valid email address",
+                    remote: "Email is already in use!"
                 },
                 password: {
                     required: "please enter valid password",
                     minlength: "Your password must be at least 8 characters long"
                 },
-
                 gender: {
                     required: "please select gender"
                 },
                 age: {
                     required: "please enter valid age",
-                    digits: "age must contain only digits"
+                    digits: "age must contain only digits",
+                    min: "min age 18 required",
+                    max: "max age 60 required"
                 },
                 address: {
                     required: "please select address"
@@ -167,4 +186,4 @@
             }
         });
     </script>
-@endpush
+@endpush --}}
