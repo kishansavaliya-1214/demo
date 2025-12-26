@@ -2,18 +2,23 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\UserRequest;
 use App\Models\Course;
 use App\Models\Student;
 use App\Models\User;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Response;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\View\View;
 use Illuminate\Validation\Rules\Password;
 
 class DashboardController extends Controller
 {
-    public function index()
+    public function index(): View
     {
         $totalStudents = User::students()->count();
         $baseStudentQuery = User::students();
@@ -31,22 +36,22 @@ class DashboardController extends Controller
         return view('admin.dashboard', compact('totalStudents', 'latestStudents', 'totalMaleStudents', 'totalFemaleStudents', 'totalCources'));
     }
 
-    public function studentDashboard()
+    public function studentDashboard(): View
     {
         return view('student.dashboard');
     }
 
-    public function profile()
+    public function profile(): View
     {
         return view('student.profile');
     }
 
-    public function adminProfile()
+    public function adminProfile(): View
     {
         return view('admin.profile');
     }
 
-    public function updateAdminProfile(Request $request)
+    public function updateAdminProfile(Request $request): RedirectResponse
     {
         $request->validate([
             'name' => 'required|string|max:255',
@@ -60,29 +65,26 @@ class DashboardController extends Controller
         return redirect()->back()->with('success', 'profile updated successfully');
     }
 
-    public function updateStudentProfile(Request $request)
+    public function updateStudentProfile(UserRequest $request): RedirectResponse
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email',
-            'phone' => 'required|min:10',
-            'age' => 'required',
-            'gender' => 'required',
-            'address' => 'required',
-        ]);
-        $user = User::findOrFail(Auth::user()->id);
+        $request->validated();
+        $user = auth()->user();
         $user->name = $request->name;
         $user->email = $request->email;
         $user->save();
-        $student = Student::where('user_id', $user->id)->firstOrFail();
+        $student = $user->student;
         $student->phone = $request->phone;
         $student->age = $request->age;
         $student->gender = $request->gender;
         $student->address = $request->address;
         if ($request->photo) {
-            $file = $request->file('photo');
+            if (Storage::disk('public')->exists('students/'.$student->photo)) {
+                Storage::disk('public')->delete('students/'.$student->photo);
+            }
+            $file = $request->photo;
             $filename = time().'.'.$file->getClientOriginalExtension();
-            $file->move(public_path('images'), $filename);
+            $file->storeAs('students', $filename, 'public');
+            // $file->move(public_path('images'), $filename);
             $student->photo = $filename;
         }
         $student->save();
@@ -90,21 +92,19 @@ class DashboardController extends Controller
         return redirect()->back()->with('success', 'profile updated successfully');
     }
 
-    public function validateEmail(Request $request)
+    public function validateEmail(Request $request): JsonResponse
     {
         $email = $request->input('email');
         $studentId = $request->input('student_id');
 
         if ($studentId) {
-            // For student editing - exclude the student's user ID
             $student = Student::find($studentId);
             $excludeUserId = $student ? $student->user_id : null;
         } else {
-            // For admin profile editing - exclude admin's ID
             $excludeUserId = Auth::user()->id;
         }
         $userExists = User::where('email', $email)->where('id', '!=', $excludeUserId)
-                         ->first();
+            ->first();
 
         if ($userExists) {
             return Response::json('This email address is already registered.');
@@ -113,7 +113,7 @@ class DashboardController extends Controller
         }
     }
 
-    public function changePassword(Request $request)
+    public function changePassword(Request $request): RedirectResponse
     {
         $request->validate([
             'old_password' => 'required',

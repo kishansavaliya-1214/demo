@@ -5,34 +5,50 @@
         <form action="{{ route('students.profile.update') }}" id="FormEmployeeData" method="post"
             enctype="multipart/form-data">
             @csrf
+            @method('PATCH')
             <div class="form-group my-2">
                 <label for="Name" class="form-label">Name</label>
                 <input type="text" class="form-control" id="name" name="name"
                     value="{{ old('name', Auth::user()->name ?? null) }}" placeholder="Enter name" required />
+                @error('name')
+                    <span class="text-danger">{{ $message }}</span>
+                @enderror
             </div>
             <div class="form-group my-2">
                 <label for="Email" class="form-label">Email</label>
                 <input type="email" class="form-control" id="email" name="email" placeholder="Enter email"
                     value="{{ old('email', Auth::user()->email ?? null) }}" required />
+                @error('email')
+                    <span class="text-danger">{{ $message }}</span>
+                @enderror
             </div>
             <div class="form-group my-2">
                 <label for="photo" class="form-label">Photo</label>
                 <input type="file" class="form-control" id="photo" name="photo" />
                 @if (Auth::user()->student->photo)
-                    <img src="{{ asset('images/' . Auth::user()->student->photo ?? null) }}" class="rounded mt-2" width="100px"
+                    <img src="{{ asset('storage/students/' . Auth::user()->student->photo ?? null) }}" class="rounded mt-2" width="100px"
                         height="100px" alt="">
                 @endif
+                @error('photo')
+                    <span class="text-danger">{{ $message }}</span>
+                @enderror
             </div>
             <div class="form-group my-2">
                 <label for="phone" class="form-label">Phone</label>
                 <input type="number" class="form-control" id="phone" minlength="10"
                     value="{{ old('phone', Auth::user()->student->phone ?? null) }}" name="phone" placeholder="Enter phone"
                     required />
+                @error('phone')
+                    <span class="text-danger">{{ $message }}</span>
+                @enderror
             </div>
             <div class="form-group my-2">
                 <label for="age" class="form-label">Age</label>
                 <input type="number" class="form-control" id="age" name="age"
                     value="{{ old('age', Auth::user()->student->age ?? null) }}" placeholder="Enter age" required />
+                @error('age')
+                    <span class="text-danger">{{ $message }}</span>
+                @enderror
             </div>
             <div class="form-group my-2">
                 <label for="gender" class="form-label">gender :</label>
@@ -40,11 +56,17 @@
                 <input type="radio" class="form-check-input me-2" name="gender" id="female" value="female" @if (Auth::user()->student->gender == "female") {{ 'checked' }} @endif /><label for="">FeMale</label>
                 <br />
                 <label id="gender-error" class="error" style="display:none;" for="gender">please select gender</label>
+                @error('gender')
+                    <span class="text-danger">{{ $message }}</span>
+                @enderror
             </div>
             <div class="form-group my-2">
                 <label for="address" class="form-label">Address</label>
                 <textarea name="address" id="address" class="form-control" placeholder="Enter Address"
                     required>{{ old('address', Auth::user()->student->address) }}</textarea>
+                @error('address')
+                    <span class="text-danger">{{ $message }}</span>
+                @enderror
             </div>
             <div class="form-group my-2">
                 <input type="submit" value="Update Profile " class="btn btn-primary" />
@@ -60,6 +82,9 @@
                     <label for="old_password" class="form-label">Old Password</label>
                     <input type="password" class="form-control" id="old_password" name="old_password"
                         placeholder="Enter old password" required />
+                    @error('old_password')
+                        <span class="text-danger">{{ $message }}</span>
+                    @enderror
                 </div>
             </div>
             <div class="form-group my-2">
@@ -67,6 +92,9 @@
                     <label for="new_password" class="form-label">New Password</label>
                     <input type="password" class="form-control" id="new_password" name="new_password"
                         placeholder="Enter new password" required />
+                    @error('new_password')
+                        <span class="error">{{ $message }}</span>
+                    @enderror
                 </div>
             </div>
             <div class="form-group my-2">
@@ -74,6 +102,9 @@
                     <label for="confirm_password" class="form-label">Confirm Password</label>
                     <input type="password" class="form-control" id="confirm_password" name="confirm_password"
                         placeholder="Enter confirm password" required />
+                    @error('confirm_password')
+                        <span class="error">{{ $message }}</span>
+                    @enderror
                 </div>
             </div>
 
@@ -137,7 +168,7 @@
                 },
                 name: {
                     required: "please enter valid name",
-                     maxlength: "Only 255 characters are allowed"
+                    maxlength: "Only 255 characters are allowed"
                 },
                 photo: {
                     extension: "Only JPG, JPEG files are allowed",

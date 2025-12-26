@@ -6,9 +6,6 @@ use App\Http\Controllers\LoginController;
 use App\Http\Controllers\StudentController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('welcome');
-});
 Route::middleware(['authLog', 'checkrole:admin'])->group(function () {
     Route::get('/admin/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
     Route::resource('students', StudentController::class);
@@ -19,15 +16,15 @@ Route::middleware(['authLog', 'checkrole:admin'])->group(function () {
 
 Route::middleware(['authLog'])->group(function () {
     Route::post('/login', [LoginController::class, 'loginForm'])->name('login.form');
-    Route::get('/login', [LoginController::class, 'login'])->name('login');
+    Route::get('/', [LoginController::class, 'login'])->name('login');
     Route::post('change-password', [DashboardController::class, 'changePassword'])->name('change.password');
-    Route::post('/validate/email',[DashboardController::class,'validateEmail'])->name('validate.email');
+    Route::post('/validate/email', [DashboardController::class, 'validateEmail'])->name('validate.email');
 });
 // Routes accessible only by users with the 'admin' role
 Route::middleware(['authLog', 'checkrole:student'])->group(function () {
     Route::get('/student/dashboard', [DashboardController::class, 'studentDashboard'])->name('student.dashboard');
     Route::get('/student/profile', [DashboardController::class, 'profile'])->name('student.profile');
-    Route::post('profile/student', [DashboardController::class, 'updateStudentProfile'])->name('students.profile.update');
+    Route::patch('profile/student', [DashboardController::class, 'updateStudentProfile'])->name('students.profile.update');
     Route::get('/all-courses', [CourseController::class, 'displayCourses'])->name('student.course');
     Route::post('student/courses', [CourseController::class, 'activateStudentCourse'])->name('student.courses');
 });

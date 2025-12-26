@@ -6,14 +6,17 @@ use App\Http\Requests\UserRequest;
 use App\Models\Student;
 use App\Models\User;
 use DataTables;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\View\View;
 
 class StudentController extends Controller
 {
-    public function index(Request $request)
+    public function index(Request $request): JsonResponse|View
     {
         if ($request->ajax()) {
             $authUserId = auth()->id();
@@ -31,7 +34,7 @@ class StudentController extends Controller
                     return $row->user->email ?? '--';
                 })
                 ->addColumn('photo', function ($row) {
-                    $url = asset("images/$row->photo");
+                    $url = asset("storage/students/$row->photo");
 
                     return '<img src="'.$url.'" border="0" width="100" height="100" class="img-rounded" align="center" />';
                 })
@@ -68,7 +71,7 @@ class StudentController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(): View
     {
         return view('student.create');
     }
@@ -76,7 +79,7 @@ class StudentController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(UserRequest $request)
+    public function store(UserRequest $request): RedirectResponse
     {
         $validatedData = $request->validated();
         $user = new User;
@@ -96,7 +99,8 @@ class StudentController extends Controller
         if ($validatedData['photo']) {
             $file = $validatedData['photo'];
             $filename = time().'.'.$file->getClientOriginalExtension();
-            $file->move(public_path('images'), $filename);
+            $file->storeAs('students', $filename, 'public');
+            // $file->move(public_path('images'), $filename);
             $student->photo = $filename;
         }
         $student->save();
@@ -107,7 +111,7 @@ class StudentController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show($id)
+    public function show($id): RedirectResponse|View
     {
         try {
             $id = decrypt($id);
@@ -122,7 +126,7 @@ class StudentController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit($id)
+    public function edit($id): RedirectResponse|View
     {
         try {
             $id = decrypt($id);
@@ -137,7 +141,7 @@ class StudentController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UserRequest $request, $id)
+    public function update(UserRequest $request, $id): RedirectResponse
     {
         $validatedData = $request->validated();
         $student = Student::findOrFail($id);
@@ -149,12 +153,13 @@ class StudentController extends Controller
         $student->age = $validatedData['age'];
         $student->address = $validatedData['address'];
         if (isset($validatedData['photo']) && ! empty($validatedData['photo'])) {
-            if (File::exists(public_path('images/'.$student->photo))) {
-                File::delete(public_path('images/'.$student->photo));
+            if (Storage::disk('public')->exists('students/'.$student->photo)) {
+                Storage::disk('public')->delete('students/'.$student->photo);
             }
             $file = $validatedData['photo'];
             $filename = time().'.'.$file->getClientOriginalExtension();
-            $file->move(public_path('images'), $filename);
+            $file->storeAs('students', $filename, 'public');
+            // $file->move(public_path('images'), $filename);
             $student->photo = $filename;
         }
         $student->save();
@@ -165,7 +170,7 @@ class StudentController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(string $id): RedirectResponse
     {
         try {
             $id = decrypt($id);
@@ -173,8 +178,8 @@ class StudentController extends Controller
             return redirect()->route('students.index')->with('error', 'Student Not Found');
         }
         $student = Student::findOrFail($id);
-        if (File::exists(public_path('images/'.$student->photo))) {
-            File::delete(public_path('images/'.$student->photo));
+        if (Storage::disk('public')->exists('students/'.$student->photo)) {
+            Storage::disk('public')->delete('students/'.$student->photo);
         }
         if ($student->user) {
             $student->user->delete();

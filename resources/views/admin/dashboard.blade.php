@@ -53,7 +53,8 @@
                     @forelse ($latestStudents as $student)
                         <tr>
                             <td>{{ $student->name }}</td>
-                            <td><img src="{{ asset('images/' . $student->student->photo ?? '') }}" height="150px" width="150px"></td>
+                            <td><img src="{{ asset('storage/students/' . $student->student->photo ?? '') }}" height="150px"
+                                    width="150px"></td>
                             <td>{{ $student->email }}</td>
                             <td>{{ $student->student->age ?? null }}</td>
                             <td>{{ $student->student->gender ?? null }}</td>

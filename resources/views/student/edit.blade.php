@@ -29,7 +29,7 @@
                     onchange="document.getElementById('imagePreview').src=window.URL.createObjectURL(this.files[0])"
                     name="photo" />
                 @if ($student->photo)
-                    <img src="{{ asset('images/' . $student->photo) }}" id="imagePreview" class="rounded mt-2" width="100"
+                    <img src="{{ asset('storage/students/' . $student->photo) }}" id="imagePreview" class="rounded mt-2" width="100"
                         height="100" alt="">
                 @else
                     <img src="{{ asset('images/Noimage.png') }}" id="imagePreview" height="100" width="100" class="rounded mt-2"
@@ -49,8 +49,8 @@
             </div>
             <div class="form-group my-2">
                 <label for="age" class="form-label">Age</label>
-                <input type="number" class="form-control" id="age" name="age" value="{{ old('age', $student->age ?? null) }}"
-                    placeholder="Enter age" required />
+                <input type="number" class="form-control" id="age" name="age"
+                    value="{{ old('age', $student->age ?? null) }}" placeholder="Enter age" required />
                 @error('age')
                     <span class="text-danger">{{ $message }}</span>
                 @enderror
@@ -93,7 +93,7 @@
             rules: {
                 name: {
                     required: true,
-                    maxlength:255
+                    maxlength: 255
                 },
                 phone: {
                     required: true,
@@ -142,7 +142,7 @@
                 },
                 name: {
                     required: "please enter valid name",
-                    maxlength:"Only 255 characters are allowed"
+                    maxlength: "Only 255 characters are allowed"
                 },
                 email: {
                     required: "please enter valid email",

@@ -6,12 +6,14 @@ use App\Models\Course;
 use App\Models\Student;
 use App\Models\StudentCourses;
 use DataTables;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\View\View;
 
 class CourseController extends Controller
 {
-    public function displayCourses()
+    public function displayCourses(): View
     {
         $courses = Course::get();
         $student = Student::where('user_id', Auth::user()->id)->firstOrFail();
@@ -20,7 +22,7 @@ class CourseController extends Controller
         return view('course.index', compact('courses', 'studentCourseIds'));
     }
 
-    public function activateStudentCourse(Request $request)
+    public function activateStudentCourse(Request $request): JsonResponse
     {
         $courseId = $request->course_id ?? 0;
         $student = Student::where('user_id', Auth::user()->id)->firstOrFail();
@@ -33,7 +35,7 @@ class CourseController extends Controller
         ]);
     }
 
-    public function allCourses(Request $request)
+    public function allCourses(Request $request): JsonResponse|View
     {
         if ($request->ajax()) {
             $data = Course::with(['students']);

@@ -35,6 +35,9 @@
                     <label for="old_password" class="form-label">Old Password</label>
                     <input type="password" class="form-control" id="old_password" name="old_password"
                         placeholder="Enter old password" required />
+                    @error('old_password')
+                        <span class="text-danger">{{ $message }}</span>
+                    @enderror
                 </div>
             </div>
             <div class="form-group my-2">
@@ -42,16 +45,19 @@
                     <label for="new_password" class="form-label">New Password</label>
                     <input type="password" class="form-control" id="new_password" name="new_password"
                         placeholder="Enter new password" required />
+                    @error('new_password')
+                        <span class="error">{{ $message }}</span>
+                    @enderror
                 </div>
-                @error('new_password')
-                    <span class="error">{{ $message }}</span>
-                @enderror
             </div>
             <div class="form-group my-2">
                 <div class="form-group my-2">
                     <label for="confirm_password" class="form-label">Confirm Password</label>
                     <input type="password" class="form-control" id="confirm_password" name="confirm_password"
                         placeholder="Enter confirm password" required />
+                    @error('confirm_password')
+                        <span class="error">{{ $message }}</span>
+                    @enderror
                 </div>
             </div>
 

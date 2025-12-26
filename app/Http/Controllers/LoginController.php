@@ -3,18 +3,20 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\View\View;
 
 class LoginController extends Controller
 {
-    public function login()
+    public function login(): View
     {
         return view('auth.login');
     }
 
-    public function loginForm(Request $request)
+    public function loginForm(Request $request): RedirectResponse
     {
         $request->validate([
             'email' => 'required|email',
@@ -33,13 +35,13 @@ class LoginController extends Controller
         }
     }
 
-    public function logout(Request $request)
+    public function logout(Request $request): RedirectResponse
     {
         Auth::logout();
 
-        $request->session()->invalidate(); // Invalidates the current session
+        $request->session()->invalidate();
 
-        $request->session()->regenerateToken(); //
+        $request->session()->regenerateToken();
 
         return redirect()->route('login');
     }

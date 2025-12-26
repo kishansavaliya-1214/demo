@@ -14,7 +14,7 @@ class Course extends Model
         'name',
         'image',
         'description',
-        'numberofhours',
+        'number_of_hours',
         'course_fee',
         'created_by',
         'created_at',

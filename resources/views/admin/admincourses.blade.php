@@ -1,6 +1,6 @@
 @extends('layouts.app')
 @section('content')
-    <div class="container mt-2">
+    <div class="container mt-2 table-responsive">
         <table class="table table-striped table-bordered data-table" id="courseList">
             <thead>
                 <tr>
@@ -30,7 +30,7 @@
                     { data: 'name', name: 'name' },
                     { data: 'image', name: 'image' },
                     { data: 'description', name: 'description' },
-                    { data: 'numberofhours', name: 'numberofhours' },
+                    { data: 'number_of_hours', name: 'number_of_hours' },
                     { data: 'course_fee', name: 'course_fee' },
                 ],
                 order: [[0, 'asc']]

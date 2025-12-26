@@ -16,7 +16,7 @@ class CheckLogin
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (Auth::user() && Auth::user()->role == "admin") {
+        if (Auth::user() && Auth::user()->role == 'admin') {
 
             if ($request->routeIs('login')) {
                 return redirect()->route('admin.dashboard');
@@ -24,7 +24,7 @@ class CheckLogin
 
             return $next($request);
         }
-        if (Auth::user() && Auth::user()->role == "student") {
+        if (Auth::user() && Auth::user()->role == 'student') {
             if ($request->routeIs('login')) {
                 return redirect()->route('student.dashboard');
             }

@@ -5,15 +5,16 @@ namespace App\Http\Controllers;
 use App\Http\Requests\UserRequest;
 use App\Models\Student;
 use App\Models\User;
-use Illuminate\Support\Facades\File;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 
 class StudentAPIController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(): JsonResponse
     {
         $students = Student::with(['courses', 'user'])->get();
 
@@ -27,7 +28,7 @@ class StudentAPIController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(UserRequest $request)
+    public function store(UserRequest $request): JsonResponse
     {
         $validatedData = $request->validated();
         $user = new User;
@@ -47,7 +48,8 @@ class StudentAPIController extends Controller
         if ($validatedData['photo']) {
             $file = $validatedData['photo'];
             $filename = time().'.'.$file->getClientOriginalExtension();
-            $file->move(public_path('images'), $filename);
+            $file->storeAs('students', $filename, 'public');
+            // $file->move(public_path('images'), $filename);
             $student->photo = $filename;
         }
         $student->save();
@@ -61,7 +63,7 @@ class StudentAPIController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show($id)
+    public function show($id): JsonResponse
     {
         $students = Student::with(['courses', 'user'])->findOrFail($id);
 
@@ -75,7 +77,7 @@ class StudentAPIController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UserRequest $request, $id)
+    public function update(UserRequest $request, $id): JsonResponse
     {
         $validatedData = $request->validated();
         $student = Student::findOrFail($id);
@@ -87,12 +89,13 @@ class StudentAPIController extends Controller
         $student->age = $validatedData['age'];
         $student->address = $validatedData['address'];
         if (isset($validatedData['photo']) && ! empty($validatedData['photo'])) {
-            if (File::exists(public_path('images/'.$student->photo))) {
-                File::delete(public_path('images/'.$student->photo));
+            if (Storage::disk('public')->exists('students/'.$student->photo)) {
+                Storage::disk('public')->delete('students/'.$student->photo);
             }
             $file = $validatedData['photo'];
             $filename = time().'.'.$file->getClientOriginalExtension();
-            $file->move(public_path('images'), $filename);
+            $file->storeAs('students', $filename, 'public');
+            // $file->move(public_path('images'), $filename);
             $student->photo = $filename;
         }
         $student->save();
@@ -106,11 +109,11 @@ class StudentAPIController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy($id)
+    public function destroy($id): JsonResponse
     {
         $student = Student::findOrFail($id);
-        if (File::exists(public_path('images/'.$student->photo))) {
-            File::delete(public_path('images/'.$student->photo));
+        if (Storage::disk('public')->exists('students/'.$student->photo)) {
+            Storage::disk('public')->delete('students/'.$student->photo);
         }
         $student->user()->delete();
         if ($student->courses) {

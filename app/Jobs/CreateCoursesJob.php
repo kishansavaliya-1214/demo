@@ -46,7 +46,7 @@ class CreateCoursesJob implements ShouldQueue
                 'image' => $productImages[array_rand($productImages)],
                 'course_fee' => $faker->randomNumber(4),
                 'created_by' => $faker->numberBetween(1, 10),
-                'numberofhours' => $faker->numberBetween(10, 200),
+                'number_of_hours' => $faker->numberBetween(10, 200),
             ]);
         }
     }

@@ -12,6 +12,7 @@ class UserRequest extends FormRequest
     {
         return true;
     }
+
     public function rules(): array
     {
         $studentId = $this->route('student');
@@ -39,9 +40,9 @@ class UserRequest extends FormRequest
 
         if ($this->isMethod('put') || $this->isMethod('patch')) {
             $student = Student::find($studentId);
-            $userId = $student ? $student->user_id : null;
+            $userId = $student ? $student->user_id : auth()->user()->id; // auth id used for update student profile
 
-            $rules['email'] = 'required|email|max:255|unique:users,email,' . $userId;
+            $rules['email'] = 'required|email|max:255|unique:users,email,'.$userId;
             $rules['photo'] = [
                 'nullable',
                 'image',

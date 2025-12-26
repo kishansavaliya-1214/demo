@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('image')->nullable();
             $table->text('description');
-            $table->integer('numberofhours');
+            $table->integer('number_of_hours');
             $table->decimal('course_fee', 8, 2)->nullable();
             $table->unsignedBigInteger('created_by')->nullable();
             $table->softDeletes();

@@ -8,7 +8,7 @@
                     <div class="card-body">
                         <h5 class="card-title">{{$course->name ?? null }}</h5>
                         <p class="card-text">{{$course->description ?? null }}</p>
-                        <div>Numbers Of Hours : {{$course->numberofhours ?? null }}</div>
+                        <div>Numbers Of Hours : {{$course->number_of_hours ?? null }}</div>
                         <div>Fees: {{$course->course_fee ?? null }}</div>
                         <button class="btn btn-primary" @if(in_array($course->id, $studentCourseIds)) {{ "disabled" }}
                         @endif>@if(in_array($course->id, $studentCourseIds)) {{ "Activated" }} @else {{ "Activate" }}
